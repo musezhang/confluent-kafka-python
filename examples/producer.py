@@ -49,11 +49,12 @@ if __name__ == '__main__':
                              (msg.topic(), msg.partition(), msg.offset()))
 
     # Read lines from stdin, produce each line to Kafka
-    for line in sys.stdin:
+    #for line in sys.stdin:
+    while True:
         try:
             # Produce line (without newline)
-            p.produce(topic, line.rstrip(), callback=delivery_callback)
-
+            #p.produce(topic, line.rstrip(), callback=delivery_callback)
+            p.produce(topic, sys.stdin.readline().rstrip(), callback=delivery_callback)
         except BufferError as e:
             sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' %
                              len(p))
