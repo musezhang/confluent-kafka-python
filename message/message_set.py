@@ -30,6 +30,8 @@ def loadfileName():
             inputfile = agr
         elif opt == '-c':
             configfile = agr
+    if (inputfile == "" and configfile == ""):
+        print "Usage: message_set.py -i [inputfile] -c [configfile]"
     return (inputfile, configfile)
 
 def parse_args(filename):  
