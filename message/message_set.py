@@ -11,6 +11,7 @@
 from confluent_kafka import Producer
 import sys, getopt, ConfigParser
 import json
+import time
 
 def loadfileName():
     argv = sys.argv[1:]
@@ -47,11 +48,12 @@ def parse_args(filename):
 
 def delivery_callback(err, msg):
     if err:
-        mylog('Message failed delivery: %s\n' % err, 'error')
+        mylog('Message failed delivery: %s' % err, 'error')
     else:
-        mylog('Message delivered to %s [%d] @ %o\n' % (msg.topic(), msg.partition(), msg.offset()), "error")
+        mylog('Message delivered to %s [%d] @ %o' % (msg.topic(), msg.partition(),
+            msg.offset()),"info")
 def mylog(logstr, type):
-    sys.stderr.write('%s|%s|%s' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), type, logstr))
+    sys.stderr.write('%s|%s|%s\n' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), type, logstr))
 
 if __name__ == '__main__':
     inputFile, configFile = loadfileName()
@@ -85,7 +87,7 @@ if __name__ == '__main__':
             mylog(logStr, "info")
             p.produce(kafka_topic, msgJson, callback=delivery_callback)
         except BufferError as e:
-            mylog('Local producer queue is full (%d messages awaiting delivery): try again\n' % len(p), "error")
+            mylog('Local producer queue is full (%d messages awaiting delivery): try again' % len(p), "error")
         p.poll(0)
     mylog('Waiting for %d deliveries\n' % len(p), "info")
     p.flush()
