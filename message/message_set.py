@@ -47,9 +47,11 @@ def parse_args(filename):
 
 def delivery_callback(err, msg):
     if err:
-        sys.stderr.write('%% Message failed delivery: %s\n' % err)
+        mylog('Message failed delivery: %s\n' % err, 'error')
     else:
-        sys.stderr.write('%% Message delivered to %s [%d] @ %o\n' % (msg.topic(), msg.partition(), msg.offset()))
+        mylog('Message delivered to %s [%d] @ %o\n' % (msg.topic(), msg.partition(), msg.offset()), "error")
+def mylog(logstr, type):
+    sys.stderr.write('%s|%s|%s' % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), type, logstr))
 
 if __name__ == '__main__':
     inputFile, configFile = loadfileName()
@@ -77,12 +79,13 @@ if __name__ == '__main__':
         outputDict['action_code'] = msgItem[5]
         outputDict['current_time'] = msgItem[6].strip()
         msgJson = json.dumps(outputDict)
-        print msgJson
 
         try:
+            logStr = 'product message to %s|%s' % (broker, msgJson)
+            mylog(logStr, "info")
             p.produce(kafka_topic, msgJson, callback=delivery_callback)
         except BufferError as e:
-            sys.stderr.write('%% Local producer queue is full (%d messages awaiting delivery): try again\n' % len(p))
+            mylog('Local producer queue is full (%d messages awaiting delivery): try again\n' % len(p), "error")
         p.poll(0)
-    sys.stderr.write('%% Waiting for %d deliveries\n' % len(p))
+    mylog('Waiting for %d deliveries\n' % len(p), "info")
     p.flush()
