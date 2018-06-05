@@ -69,11 +69,9 @@ if __name__ == '__main__':
     broker = '%s:%d' % (kafka_ip, kafka_port)
     conf = {'bootstrap.servers': broker}
     p = Producer(**conf)
-    print "ddddd"
     #主流程，循环遍历每行文件内容，转换为json写入kafka
     for line in msglist:
         msgItem = line.split(',')
-        
         outputDict = {}
         outputDict['source_uid'] = msgItem[0]
         outputDict['target_uid'] = msgItem[1]
